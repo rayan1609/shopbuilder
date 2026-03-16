@@ -11,7 +11,7 @@ export default function ImageImporter() {
   const [productTitle, setProductTitle] = useState('')
 
   const addUrls = () => {
-    const urls = urlInput.split('\n').filter(u => u.trim().startsWith('http'))
+    const urls = urlInput.split(/[\n\s]+/).filter(u => u.trim().startsWith('http'))
     setImages(prev => [...prev, ...urls.filter(u => !prev.includes(u))])
     setUrlInput('')
   }
