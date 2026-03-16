@@ -14,24 +14,38 @@ import ViralScore from '../components/ViralScore'
 import AdAnalyzer from '../components/AdAnalyzer'
 import MultiShop from '../components/MultiShop'
 import Chatbot from '../components/Chatbot'
+import CompetitorFinder from '../components/CompetitorFinder'
+import PricingStrategy from '../components/PricingStrategy'
+import LaunchChecklist from '../components/LaunchChecklist'
+import BrandName from '../components/BrandName'
 
 const menu = [
   { id: 'dashboard', label: 'Dashboard', icon: '📈' },
   { id: 'chat', label: 'Conseiller IA', icon: '🤖' },
-  { type: 'separator', label: 'Produits' },
+
+  { type: 'separator', label: '— Produits' },
   { id: 'generator', label: 'Générateur', icon: '⚡' },
   { id: 'viral', label: 'Score viral', icon: '🔥' },
   { id: 'trends', label: 'Tendances', icon: '📊' },
-  { id: 'spy', label: 'Spy', icon: '🕵️' },
-  { type: 'separator', label: 'Boutique' },
+  { id: 'pricing', label: 'Stratégie prix', icon: '💰' },
+
+  { type: 'separator', label: '— Boutique' },
   { id: 'theme', label: 'Thème Shopify', icon: '🎨' },
   { id: 'shop', label: 'Créer un shop', icon: '🏪' },
   { id: 'shops', label: 'Mes shops', icon: '🗂️' },
-  { type: 'separator', label: 'Marketing' },
+  { id: 'brand', label: 'Nom de marque', icon: '✨' },
+  { id: 'launch', label: 'Checklist lancement', icon: '🚀' },
+
+  { type: 'separator', label: '— Concurrence' },
+  { id: 'spy', label: 'Spy shops', icon: '🕵️' },
+  { id: 'competitors', label: 'Mes concurrents', icon: '🔍' },
+
+  { type: 'separator', label: '— Marketing' },
   { id: 'ads', label: 'Pubs & UGC', icon: '🎯' },
   { id: 'email', label: 'Emails', icon: '📧' },
-  { type: 'separator', label: 'Outils' },
-  { id: 'margin', label: 'Marge', icon: '💰' },
+
+  { type: 'separator', label: '— Outils' },
+  { id: 'margin', label: 'Calculateur marge', icon: '📊' },
   { id: 'legal', label: 'Documents légaux', icon: '⚖️' },
   { id: 'history', label: 'Historique', icon: '📋' },
 ]
@@ -104,14 +118,18 @@ export default function Home() {
             {activeTab === 'chat' && <Chatbot />}
             {activeTab === 'generator' && <ProductGenerator />}
             {activeTab === 'viral' && <ViralScore />}
-            {activeTab === 'ads' && <AdAnalyzer />}
+            {activeTab === 'trends' && <TrendFinder />}
+            {activeTab === 'pricing' && <PricingStrategy />}
             {activeTab === 'theme' && <ThemeGenerator />}
             {activeTab === 'shop' && <ShopCreator />}
             {activeTab === 'shops' && <MultiShop />}
-            {activeTab === 'trends' && <TrendFinder />}
+            {activeTab === 'brand' && <BrandName />}
+            {activeTab === 'launch' && <LaunchChecklist />}
             {activeTab === 'spy' && <SpyTool />}
-            {activeTab === 'margin' && <MarginCalculator />}
+            {activeTab === 'competitors' && <CompetitorFinder />}
+            {activeTab === 'ads' && <AdAnalyzer />}
             {activeTab === 'email' && <EmailGenerator />}
+            {activeTab === 'margin' && <MarginCalculator />}
             {activeTab === 'legal' && <LegalGenerator />}
             {activeTab === 'history' && <History />}
           </div>
@@ -137,13 +155,13 @@ export default function Home() {
         .app { display: flex; min-height: 100vh; }
         .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 56px; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 16px; align-items: center; justify-content: space-between; z-index: 100; }
         .menu-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text); width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 16px; }
-        .sidebar { width: var(--sidebar-width); background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 24px 12px; position: fixed; height: 100vh; top: 0; left: 0; z-index: 99; transition: transform 0.3s; overflow-y: auto; }
+        .sidebar { width: var(--sidebar-width); background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px 12px; position: fixed; height: 100vh; top: 0; left: 0; z-index: 99; transition: transform 0.3s; overflow-y: auto; }
         .overlay { display: none; position: fixed; inset: 0; background: #00000080; z-index: 98; }
-        .logo { display: flex; align-items: center; gap: 10px; padding: 8px 12px 20px; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; }
+        .logo { display: flex; align-items: center; gap: 10px; padding: 8px 12px 16px; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; }
         .logo-icon { font-size: 22px; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
-        .nav-separator { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); padding: 12px 12px 4px; opacity: 0.6; }
-        .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; border: none; background: transparent; color: var(--muted); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; transition: all 0.2s; position: relative; text-align: left; width: 100%; }
+        .nav-separator { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); padding: 10px 12px 4px; opacity: 0.5; }
+        .nav-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; border: none; background: transparent; color: var(--muted); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; transition: all 0.2s; position: relative; text-align: left; width: 100%; }
         .nav-item:hover { background: var(--surface2); color: var(--text); }
         .nav-item.active { background: linear-gradient(135deg, #7c5cfc15, #fc5c7d10); color: var(--text); border: 1px solid #7c5cfc30; }
         .nav-indicator { width: 4px; height: 4px; background: var(--accent); border-radius: 50%; margin-left: auto; }
