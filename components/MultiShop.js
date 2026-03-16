@@ -10,17 +10,15 @@ export default function MultiShop() {
     setMounted(true)
     try {
       const saved = localStorage.getItem('shopbuilder_shops')
-      if (saved) setShops(JSON.parse(saved))
-      else {
-        const defaultShop = [{ id: 1, name: 'Mon shop principal', shop: 'rcr7bc-ac.myshopify.com', token: '***', active: true }]
-        setShops(defaultShop)
+      if (saved) {
+        setShops(JSON.parse(saved))
       }
     } catch (e) {}
   }, [])
 
   const save = (newShops) => {
     setShops(newShops)
-    localStorage.setItem('shopbuilder_shops', JSON.stringify(newShops))
+    try { localStorage.setItem('shopbuilder_shops', JSON.stringify(newShops)) } catch(e) {}
   }
 
   const addShop = () => {
@@ -31,15 +29,15 @@ export default function MultiShop() {
     setAdding(false)
   }
 
-  const setActive = (id) => {
-    save(shops.map(s => ({ ...s, active: s.id === id })))
-  }
+  const setActive = (id) => save(shops.map(s => ({ ...s, active: s.id === id })))
+  const removeShop = (id) => save(shops.filter(s => s.id !== id))
 
-  const removeShop = (id) => {
-    save(shops.filter(s => s.id !== id))
-  }
-
-  if (!mounted) return null
+  if (!mounted) return (
+    <div className="card">
+      <p className="card-title">🗂️ Mes shops</p>
+      <div className="loading"><div className="spinner" />Chargement...</div>
+    </div>
+  )
 
   return (
     <div>
@@ -49,30 +47,34 @@ export default function MultiShop() {
           Connecte plusieurs boutiques Shopify et switche entre elles en 1 clic.
         </p>
 
+        {shops.length === 0 && (
+          <div style={{ textAlign: 'center', padding: '20px', color: 'var(--muted)', fontSize: 14 }}>
+            Aucun shop connecté. Ajoute ton premier shop ci-dessous.
+          </div>
+        )}
+
         {shops.map(shop => (
-          <div key={shop.id} className={`shop-card ${shop.active ? 'active' : ''}`}>
-            <div className="shop-info">
-              <div className="shop-dot" style={{ background: shop.active ? '#2ecc71' : 'var(--muted)' }} />
+          <div key={shop.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', background: 'var(--surface2)', borderRadius: 10, border: shop.active ? '1px solid #2ecc7130' : '1px solid var(--border)', marginBottom: 10, background: shop.active ? '#2ecc7108' : 'var(--surface2)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 10, height: 10, borderRadius: '50%', background: shop.active ? '#2ecc71' : 'var(--muted)', flexShrink: 0 }} />
               <div>
-                <div className="shop-name">{shop.name}</div>
-                <div className="shop-url">{shop.shop}</div>
+                <div style={{ fontWeight: 600, fontSize: 14 }}>{shop.name}</div>
+                <div style={{ fontSize: 12, color: 'var(--muted)' }}>{shop.shop}</div>
               </div>
             </div>
-            <div className="shop-actions">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               {shop.active ? (
-                <span className="active-badge">✅ Actif</span>
+                <span style={{ fontSize: 13, color: '#2ecc71', fontWeight: 600 }}>✅ Actif</span>
               ) : (
-                <button className="btn btn-secondary" onClick={() => setActive(shop.id)} style={{ padding: '6px 14px', fontSize: 13 }}>
-                  Activer
-                </button>
+                <button className="btn btn-secondary" onClick={() => setActive(shop.id)} style={{ padding: '6px 14px', fontSize: 13 }}>Activer</button>
               )}
-              <button onClick={() => removeShop(shop.id)} style={{ background: 'none', border: 'none', color: '#e74c3c', cursor: 'pointer', fontSize: 18, padding: '0 4px' }}>🗑</button>
+              <button onClick={() => removeShop(shop.id)} style={{ background: 'none', border: 'none', color: '#e74c3c', cursor: 'pointer', fontSize: 18 }}>🗑</button>
             </div>
           </div>
         ))}
 
         {adding ? (
-          <div className="add-form">
+          <div style={{ background: 'var(--surface2)', borderRadius: 10, padding: 16, marginTop: 12, border: '1px solid var(--border)' }}>
             <div className="grid-2">
               <div className="input-group">
                 <label className="input-label">Nom du shop</label>
@@ -105,21 +107,9 @@ export default function MultiShop() {
           <li>Va sur <strong style={{ color: 'var(--text)' }}>shopbuilder-omega.vercel.app/api/auth/install?shop=TONSHOP.myshopify.com</strong></li>
           <li>Remplace TONSHOP par le nom de ton shop</li>
           <li>Autorise l'application</li>
-          <li>Copie le token généré et colle le ici</li>
+          <li>Copie le token et colle le ici</li>
         </ol>
       </div>
-
-      <style jsx>{`
-        .shop-card { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: var(--surface2); border-radius: 10px; border: 1px solid var(--border); margin-bottom: 10px; transition: all 0.2s; }
-        .shop-card.active { border-color: #2ecc7130; background: #2ecc7108; }
-        .shop-info { display: flex; align-items: center; gap: 12px; }
-        .shop-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-        .shop-name { font-weight: 600; font-size: 14px; }
-        .shop-url { font-size: 12px; color: var(--muted); }
-        .shop-actions { display: flex; align-items: center; gap: 8px; }
-        .active-badge { font-size: 13px; color: #2ecc71; font-weight: 600; }
-        .add-form { background: var(--surface2); border-radius: 10px; padding: 16px; margin-top: 12px; border: 1px solid var(--border); }
-      `}</style>
     </div>
   )
 }
