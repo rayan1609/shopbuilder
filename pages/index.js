@@ -9,6 +9,8 @@ import EmailGenerator from '../components/EmailGenerator'
 import History from '../components/History'
 import Dashboard from '../components/Dashboard'
 import ThemeGenerator from '../components/ThemeGenerator'
+import LegalGenerator from '../components/LegalGenerator'
+import ViralScore from '../components/ViralScore'
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -17,12 +19,14 @@ export default function Home() {
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: '📈' },
     { id: 'generator', label: 'Générateur', icon: '⚡' },
+    { id: 'viral', label: 'Score viral', icon: '🔥' },
     { id: 'theme', label: 'Thème Shopify', icon: '🎨' },
     { id: 'shop', label: 'Créer un shop', icon: '🏪' },
-    { id: 'trends', label: 'Tendances', icon: '🔥' },
+    { id: 'trends', label: 'Tendances', icon: '📊' },
     { id: 'spy', label: 'Spy', icon: '🕵️' },
-    { id: 'margin', label: 'Marge', icon: '📊' },
+    { id: 'margin', label: 'Marge', icon: '💰' },
     { id: 'email', label: 'Emails', icon: '📧' },
+    { id: 'legal', label: 'Documents légaux', icon: '⚖️' },
     { id: 'history', label: 'Historique', icon: '📋' },
   ]
 
@@ -82,12 +86,14 @@ export default function Home() {
           <div className="content">
             {activeTab === 'dashboard' && <Dashboard />}
             {activeTab === 'generator' && <ProductGenerator />}
+            {activeTab === 'viral' && <ViralScore />}
             {activeTab === 'theme' && <ThemeGenerator />}
             {activeTab === 'shop' && <ShopCreator />}
             {activeTab === 'trends' && <TrendFinder />}
             {activeTab === 'spy' && <SpyTool />}
             {activeTab === 'margin' && <MarginCalculator />}
             {activeTab === 'email' && <EmailGenerator />}
+            {activeTab === 'legal' && <LegalGenerator />}
             {activeTab === 'history' && <History />}
           </div>
         </main>
