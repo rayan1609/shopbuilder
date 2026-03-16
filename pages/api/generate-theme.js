@@ -54,11 +54,10 @@ Réponds UNIQUEMENT en JSON:
     const c = JSON.parse(aiData.choices[0].message.content)
     const brand = brandName || 'Ma Boutique'
     const imgKeyword = encodeURIComponent(c.imageKeyword || product.title || 'product')
-    const heroImg = `https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1200&h=500&fit=crop&q=80`
-    const productImg1 = `https://source.unsplash.com/800x800/?${imgKeyword}&sig=1`
-    const productImg2 = `https://source.unsplash.com/800x800/?${imgKeyword}&sig=2`
-    const productImg3 = `https://source.unsplash.com/800x800/?${imgKeyword}&sig=3`
-
+    const heroImg = `https://picsum.photos/seed/${imgKeyword}1/1200/500`
+const productImg1 = `https://picsum.photos/seed/${imgKeyword}1/800/800`
+const productImg2 = `https://picsum.photos/seed/${imgKeyword}2/800/800`
+const productImg3 = `https://picsum.photos/seed/${imgKeyword}3/800/800`
     const themeLiquid = `<!DOCTYPE html>
 <html lang="fr">
 <head>
