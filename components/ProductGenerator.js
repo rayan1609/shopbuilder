@@ -10,11 +10,15 @@ export default function ProductGenerator() {
   const [pushing, setPushing] = useState(false)
   const [pushed, setPushed] = useState(false)
   const [showPage, setShowPage] = useState(false)
+  const [translating, setTranslating] = useState(false)
+  const [translatedResult, setTranslatedResult] = useState(null)
+  const [selectedLang, setSelectedLang] = useState('')
 
   const generate = async () => {
     if (!url.trim() && !productName.trim()) return
     setLoading(true)
     setResult(null)
+    setTranslatedResult(null)
     setError(null)
     try {
       const res = await fetch('/api/generate-product', {
@@ -37,6 +41,26 @@ export default function ProductGenerator() {
     }
   }
 
+  const translate = async (lang) => {
+    if (!result) return
+    setTranslating(true)
+    setSelectedLang(lang)
+    try {
+      const res = await fetch('/api/translate-product', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product: result, language: lang }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+      setTranslatedResult(data)
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setTranslating(false)
+    }
+  }
+
   const pushToShopify = async () => {
     if (!result) return
     setPushing(true)
@@ -44,7 +68,7 @@ export default function ProductGenerator() {
       const res = await fetch('/api/push-product', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product: result }),
+        body: JSON.stringify({ product: translatedResult || result }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Erreur Shopify')
@@ -56,9 +80,20 @@ export default function ProductGenerator() {
     }
   }
 
+  const displayResult = translatedResult || result
+
+  const languages = [
+    { code: 'en', flag: '🇬🇧', label: 'Anglais' },
+    { code: 'es', flag: '🇪🇸', label: 'Espagnol' },
+    { code: 'de', flag: '🇩🇪', label: 'Allemand' },
+    { code: 'it', flag: '🇮🇹', label: 'Italien' },
+    { code: 'pt', flag: '🇵🇹', label: 'Portugais' },
+    { code: 'ar', flag: '🇸🇦', label: 'Arabe' },
+  ]
+
   return (
     <div>
-      {showPage && <ProductPage product={result} onClose={() => setShowPage(false)} />}
+      {showPage && <ProductPage product={displayResult} onClose={() => setShowPage(false)} />}
 
       <div className="card">
         <p className="card-title">Étape 1 — Décris ton produit</p>
@@ -104,34 +139,63 @@ export default function ProductGenerator() {
             <div className="grid-2" style={{ marginBottom: 16 }}>
               <div>
                 <label className="input-label">Titre produit</label>
-                <div className="result-field">{result.title}</div>
+                <div className="result-field">{displayResult.title}</div>
               </div>
               <div>
                 <label className="input-label">Prix suggéré</label>
-                <div className="result-field">{result.price}</div>
+                <div className="result-field">{displayResult.price}</div>
               </div>
             </div>
             <div style={{ marginBottom: 16 }}>
               <label className="input-label">Description optimisée</label>
-              <div className="result-box">{result.description}</div>
+              <div className="result-box">{displayResult.description}</div>
             </div>
             <div style={{ marginBottom: 16 }}>
               <label className="input-label">Points clés</label>
-              <div className="result-box">{result.bullets}</div>
+              <div className="result-box">{displayResult.bullets}</div>
             </div>
             <div style={{ marginBottom: 16 }}>
               <label className="input-label">Tags SEO</label>
               <div>
-                {result.tags?.map((tag, i) => (
+                {displayResult.tags?.map((tag, i) => (
                   <span key={i} className="tag">{tag}</span>
                 ))}
               </div>
             </div>
             <div style={{ marginBottom: 20 }}>
               <label className="input-label">Script publicitaire TikTok/Reels</label>
-              <div className="result-box">{result.adScript}</div>
+              <div className="result-box">{displayResult.adScript}</div>
             </div>
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+
+            {/* Translation section */}
+            <div className="translate-section">
+              <label className="input-label">🌍 Traduire cette fiche en :</label>
+              <div className="lang-buttons">
+                <button
+                  className={`lang-btn ${!translatedResult ? 'active' : ''}`}
+                  onClick={() => setTranslatedResult(null)}
+                >
+                  🇫🇷 Français
+                </button>
+                {languages.map(lang => (
+                  <button
+                    key={lang.code}
+                    className={`lang-btn ${selectedLang === lang.code && translatedResult ? 'active' : ''}`}
+                    onClick={() => translate(lang.code)}
+                    disabled={translating}
+                  >
+                    {translating && selectedLang === lang.code ? '⏳' : lang.flag} {lang.label}
+                  </button>
+                ))}
+              </div>
+              {translatedResult && (
+                <div className="translation-badge">
+                  ✅ Traduit en {languages.find(l => l.code === selectedLang)?.label}
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 16 }}>
               <button className="btn btn-primary" onClick={() => setShowPage(true)}>
                 👁 Voir la page produit
               </button>
@@ -152,6 +216,35 @@ export default function ProductGenerator() {
           padding: 12px 16px;
           font-size: 14px;
           color: var(--text);
+        }
+        .translate-section {
+          border-top: 1px solid var(--border);
+          padding-top: 16px;
+        }
+        .lang-buttons {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 8px;
+        }
+        .lang-btn {
+          padding: 7px 14px;
+          border-radius: 20px;
+          border: 1px solid var(--border);
+          background: var(--surface2);
+          color: var(--muted);
+          cursor: pointer;
+          font-size: 13px;
+          font-weight: 500;
+          transition: all 0.2s;
+        }
+        .lang-btn:hover { border-color: var(--accent); color: var(--text); }
+        .lang-btn.active { border-color: var(--accent); background: #7c5cfc20; color: #a084fd; }
+        .lang-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .translation-badge {
+          margin-top: 10px;
+          font-size: 13px;
+          color: var(--success);
         }
       `}</style>
     </div>
