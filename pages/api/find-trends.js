@@ -7,8 +7,6 @@ export default async function handler(req, res) {
 
 Génère une liste de 6 produits dropshipping actuellement viraux ${niche ? `dans la niche: ${niche}` : 'toutes niches confondues'}.
 
-Base-toi sur les tendances actuelles TikTok Shop, Meta Ads, AliExpress trending.
-
 Réponds UNIQUEMENT en JSON valide:
 {
   "products": [
@@ -28,29 +26,28 @@ Réponds UNIQUEMENT en JSON valide:
 }`
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
+        model: 'llama3-70b-8192',
         max_tokens: 2000,
         messages: [{ role: 'user', content: prompt }],
+        response_format: { type: 'json_object' }
       }),
     })
 
     const data = await response.json()
     
-    if (!response.ok || !data.content || !data.content[0]) {
+    if (!response.ok) {
       return res.status(500).json({ error: 'Erreur API: ' + JSON.stringify(data) })
     }
     
-    const text = data.content[0].text
-    const clean = text.replace(/```json|```/g, '').trim()
-    const result = JSON.parse(clean)
+    const text = data.choices[0].message.content
+    const result = JSON.parse(text)
 
     return res.status(200).json(result)
   } catch (e) {
