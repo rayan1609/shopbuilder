@@ -15,26 +15,32 @@ import AdAnalyzer from '../components/AdAnalyzer'
 import MultiShop from '../components/MultiShop'
 import Chatbot from '../components/Chatbot'
 
+const menu = [
+  { id: 'dashboard', label: 'Dashboard', icon: '📈' },
+  { id: 'chat', label: 'Conseiller IA', icon: '🤖' },
+  { type: 'separator', label: 'Produits' },
+  { id: 'generator', label: 'Générateur', icon: '⚡' },
+  { id: 'viral', label: 'Score viral', icon: '🔥' },
+  { id: 'trends', label: 'Tendances', icon: '📊' },
+  { id: 'spy', label: 'Spy', icon: '🕵️' },
+  { type: 'separator', label: 'Boutique' },
+  { id: 'theme', label: 'Thème Shopify', icon: '🎨' },
+  { id: 'shop', label: 'Créer un shop', icon: '🏪' },
+  { id: 'shops', label: 'Mes shops', icon: '🗂️' },
+  { type: 'separator', label: 'Marketing' },
+  { id: 'ads', label: 'Pubs & UGC', icon: '🎯' },
+  { id: 'email', label: 'Emails', icon: '📧' },
+  { type: 'separator', label: 'Outils' },
+  { id: 'margin', label: 'Marge', icon: '💰' },
+  { id: 'legal', label: 'Documents légaux', icon: '⚖️' },
+  { id: 'history', label: 'Historique', icon: '📋' },
+]
+
 export default function Home() {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [menuOpen, setMenuOpen] = useState(false)
 
-  const tabs = [
-    { id: 'dashboard', label: 'Dashboard', icon: '📈' },
-    { id: 'chat', label: 'Conseiller IA', icon: '🤖' },
-    { id: 'generator', label: 'Générateur', icon: '⚡' },
-    { id: 'viral', label: 'Score viral', icon: '🔥' },
-    { id: 'ads', label: 'Pubs & UGC', icon: '🎯' },
-    { id: 'theme', label: 'Thème Shopify', icon: '🎨' },
-    { id: 'shop', label: 'Créer un shop', icon: '🏪' },
-    { id: 'shops', label: 'Mes shops', icon: '🗂️' },
-    { id: 'trends', label: 'Tendances', icon: '📊' },
-    { id: 'spy', label: 'Spy', icon: '🕵️' },
-    { id: 'margin', label: 'Marge', icon: '💰' },
-    { id: 'email', label: 'Emails', icon: '📧' },
-    { id: 'legal', label: 'Documents légaux', icon: '⚖️' },
-    { id: 'history', label: 'Historique', icon: '📋' },
-  ]
+  const activeItem = menu.find(t => t.id === activeTab)
 
   return (
     <>
@@ -61,17 +67,22 @@ export default function Home() {
             <span className="logo-text">ShopBuilder</span>
           </div>
           <nav className="nav">
-            {tabs.map(tab => (
-              <button
-                key={tab.id}
-                className={`nav-item ${activeTab === tab.id ? 'active' : ''}`}
-                onClick={() => { setActiveTab(tab.id); setMenuOpen(false) }}
-              >
-                <span className="nav-icon">{tab.icon}</span>
-                <span className="nav-label">{tab.label}</span>
-                {activeTab === tab.id && <span className="nav-indicator" />}
-              </button>
-            ))}
+            {menu.map((item, i) => {
+              if (item.type === 'separator') return (
+                <div key={i} className="nav-separator">{item.label}</div>
+              )
+              return (
+                <button
+                  key={item.id}
+                  className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
+                  onClick={() => { setActiveTab(item.id); setMenuOpen(false) }}
+                >
+                  <span className="nav-icon">{item.icon}</span>
+                  <span className="nav-label">{item.label}</span>
+                  {activeTab === item.id && <span className="nav-indicator" />}
+                </button>
+              )
+            })}
           </nav>
           <div className="sidebar-footer">
             <div className="status-dot" />
@@ -84,8 +95,7 @@ export default function Home() {
         <main className="main">
           <div className="main-header">
             <h1 className="page-title">
-              {tabs.find(t => t.id === activeTab)?.icon}{' '}
-              {tabs.find(t => t.id === activeTab)?.label}
+              {activeItem?.icon} {activeItem?.label}
             </h1>
             <div className="badge">Powered by AI</div>
           </div>
@@ -129,14 +139,15 @@ export default function Home() {
         .menu-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text); width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 16px; }
         .sidebar { width: var(--sidebar-width); background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 24px 12px; position: fixed; height: 100vh; top: 0; left: 0; z-index: 99; transition: transform 0.3s; overflow-y: auto; }
         .overlay { display: none; position: fixed; inset: 0; background: #00000080; z-index: 98; }
-        .logo { display: flex; align-items: center; gap: 10px; padding: 8px 12px 28px; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; }
+        .logo { display: flex; align-items: center; gap: 10px; padding: 8px 12px 20px; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; }
         .logo-icon { font-size: 22px; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .nav { display: flex; flex-direction: column; gap: 3px; flex: 1; }
-        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; border: none; background: transparent; color: var(--muted); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; transition: all 0.2s; position: relative; text-align: left; width: 100%; }
+        .nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+        .nav-separator { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); padding: 12px 12px 4px; opacity: 0.6; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; border: none; background: transparent; color: var(--muted); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; transition: all 0.2s; position: relative; text-align: left; width: 100%; }
         .nav-item:hover { background: var(--surface2); color: var(--text); }
         .nav-item.active { background: linear-gradient(135deg, #7c5cfc15, #fc5c7d10); color: var(--text); border: 1px solid #7c5cfc30; }
         .nav-indicator { width: 4px; height: 4px; background: var(--accent); border-radius: 50%; margin-left: auto; }
-        .sidebar-footer { display: flex; align-items: center; gap: 8px; padding: 12px; font-size: 12px; color: var(--muted); }
+        .sidebar-footer { display: flex; align-items: center; gap: 8px; padding: 12px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--border); margin-top: 8px; }
         .status-dot { width: 7px; height: 7px; background: var(--success); border-radius: 50%; box-shadow: 0 0 6px var(--success); }
         .main { margin-left: var(--sidebar-width); flex: 1; padding: 32px; min-height: 100vh; }
         .main-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
