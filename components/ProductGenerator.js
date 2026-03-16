@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import ProductPage from './ProductPage'
 
 export default function ProductGenerator() {
   const [url, setUrl] = useState('')
@@ -8,6 +9,7 @@ export default function ProductGenerator() {
   const [error, setError] = useState(null)
   const [pushing, setPushing] = useState(false)
   const [pushed, setPushed] = useState(false)
+  const [showPage, setShowPage] = useState(false)
 
   const generate = async () => {
     if (!url.trim() && !productName.trim()) return
@@ -23,12 +25,11 @@ export default function ProductGenerator() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Erreur inconnue')
       setResult(data)
-      // Sauvegarder dans l'historique
-try {
-  const history = JSON.parse(localStorage.getItem('shopbuilder_history') || '[]')
-  history.unshift({ ...data, date: new Date().toLocaleDateString('fr-FR') })
-  localStorage.setItem('shopbuilder_history', JSON.stringify(history.slice(0, 50)))
-} catch (e) {}
+      try {
+        const history = JSON.parse(localStorage.getItem('shopbuilder_history') || '[]')
+        history.unshift({ ...data, date: new Date().toLocaleDateString('fr-FR') })
+        localStorage.setItem('shopbuilder_history', JSON.stringify(history.slice(0, 50)))
+      } catch (e) {}
     } catch (e) {
       setError(e.message)
     } finally {
@@ -57,6 +58,8 @@ try {
 
   return (
     <div>
+      {showPage && <ProductPage product={result} onClose={() => setShowPage(false)} />}
+
       <div className="card">
         <p className="card-title">Étape 1 — Décris ton produit</p>
         <div className="input-group">
@@ -128,9 +131,14 @@ try {
               <label className="input-label">Script publicitaire TikTok/Reels</label>
               <div className="result-box">{result.adScript}</div>
             </div>
-            <button className="btn btn-primary" onClick={pushToShopify} disabled={pushing || pushed}>
-              {pushing ? '⏳ Envoi vers Shopify...' : pushed ? '✅ Envoyé !' : '🏪 Envoyer vers Shopify'}
-            </button>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <button className="btn btn-primary" onClick={() => setShowPage(true)}>
+                👁 Voir la page produit
+              </button>
+              <button className="btn btn-secondary" onClick={pushToShopify} disabled={pushing || pushed}>
+                {pushing ? '⏳ Envoi...' : pushed ? '✅ Envoyé !' : '🏪 Envoyer sur Shopify'}
+              </button>
+            </div>
           </div>
           {pushed && <div className="success-banner">✅ Produit ajouté à ton shop Shopify !</div>}
         </>
