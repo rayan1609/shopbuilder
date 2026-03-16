@@ -1,7 +1,7 @@
 // CompetitorFinder.js
 import { useState } from 'react'
 
-export function CompetitorFinder() {
+export default function CompetitorFinder() {
   const [productName, setProductName] = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
