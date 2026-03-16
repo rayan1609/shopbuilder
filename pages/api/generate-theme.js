@@ -268,15 +268,66 @@ function selectBundle(el){document.querySelectorAll('.bundle').forEach(b=>{b.sty
       return buf
     }
 
+   const collectionLiquid = `<style>.collection-page{padding:60px 0}.collection-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:32px}.product-card{border-radius:12px;overflow:hidden;border:1px solid #eee;transition:all 0.2s}.product-card:hover{box-shadow:0 8px 30px rgba(0,0,0,0.1);transform:translateY(-2px)}.product-card-img{background:#f5f5f5;height:240px;display:flex;align-items:center;justify-content:center;overflow:hidden}.product-card-img img{max-width:100%;max-height:100%;object-fit:contain}.product-card-info{padding:16px}.product-card-title{font-size:15px;font-weight:600;margin-bottom:8px;color:#111}.product-card-price{font-size:18px;font-weight:800;color:${primaryColor};margin-bottom:12px}.product-card-btn{display:block;width:100%;background:${primaryColor};color:white;border:none;padding:10px;border-radius:8px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer}@media(max-width:768px){.collection-grid{grid-template-columns:1fr 1fr}}</style>
+<section class="collection-page"><div class="container">
+<h1 style="font-size:32px;font-weight:800;margin-bottom:8px">{{ collection.title }}</h1>
+<p style="color:#777;margin-bottom:32px">{{ collection.description }}</p>
+<div class="collection-grid">
+{% for product in collection.products %}
+<div class="product-card">
+<div class="product-card-img">{{ product.featured_image | img_tag: product.title }}</div>
+<div class="product-card-info">
+<div class="product-card-title">{{ product.title }}</div>
+<div class="product-card-price">{{ product.price | money }}</div>
+<a href="{{ product.url }}" class="product-card-btn">Voir le produit</a>
+</div></div>
+{% endfor %}
+</div></div></section>`
+
+const pageLiquid = `<section style="padding:60px 0"><div class="container">
+<h1 style="font-size:32px;font-weight:800;margin-bottom:24px">{{ page.title }}</h1>
+<div style="font-size:16px;line-height:1.7;color:#555">{{ page.content }}</div>
+</div></section>`
+
+const cartLiquid = `<section style="padding:60px 0"><div class="container">
+<h1 style="font-size:32px;font-weight:800;margin-bottom:32px">🛒 Mon panier</h1>
+{% if cart.item_count == 0 %}
+<p style="color:#777;font-size:16px">Ton panier est vide. <a href="/collections/all" style="color:${primaryColor}">Continuer les achats</a></p>
+{% else %}
+{% for item in cart.items %}
+<div style="display:flex;gap:16px;padding:16px 0;border-bottom:1px solid #eee">
+<div style="width:80px;height:80px;background:#f5f5f5;border-radius:8px;overflow:hidden">{{ item.image | img_tag: item.title }}</div>
+<div style="flex:1">
+<div style="font-weight:600">{{ item.title }}</div>
+<div style="color:#777;font-size:14px">Qté: {{ item.quantity }}</div>
+<div style="font-weight:800;color:${primaryColor}">{{ item.line_price | money }}</div>
+</div></div>
+{% endfor %}
+<div style="margin-top:24px;text-align:right">
+<div style="font-size:20px;font-weight:800;margin-bottom:16px">Total: {{ cart.total_price | money }}</div>
+<a href="/checkout" style="display:inline-block;background:${primaryColor};color:white;padding:16px 32px;border-radius:12px;font-size:18px;font-weight:700;text-decoration:none">⚡ Commander maintenant</a>
+</div>
+{% endif %}
+</div></section>`
+
+const notFoundLiquid = `<section style="padding:120px 0;text-align:center"><div class="container">
+<h1 style="font-size:80px;font-weight:900;color:${primaryColor}">404</h1>
+<p style="font-size:24px;margin-bottom:32px;color:#777">Page introuvable</p>
+<a href="/" style="display:inline-block;background:${primaryColor};color:white;padding:14px 32px;border-radius:12px;font-weight:700;text-decoration:none">Retour à l'accueil</a>
+</div></section>`
+
     const fileEntries = [
       { name: 'layout/theme.liquid', content: themeLiquid },
       { name: 'templates/index.liquid', content: indexLiquid },
       { name: 'templates/product.liquid', content: productLiquid },
+      { name: 'templates/collection.liquid', content: collectionLiquid },
+      { name: 'templates/page.liquid', content: pageLiquid },
+      { name: 'templates/cart.liquid', content: cartLiquid },
+      { name: 'templates/404.liquid', content: notFoundLiquid },
       { name: 'config/settings_schema.json', content: JSON.stringify([{"name":"theme_info","theme_name":brand,"theme_version":"1.0.0"}]) },
       { name: 'config/settings_data.json', content: JSON.stringify({"current":{}}) },
       { name: 'locales/fr.default.json', content: JSON.stringify({"general":{"language":"Français"}}) },
     ]
-
     const localHeaders = []
     let offset = 0
     const parts = []
