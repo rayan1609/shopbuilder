@@ -50,23 +50,19 @@ function ProductPageView({ product, onClose }) {
           <button onClick={onClose} style={{background:'#111',color:'#fff',border:'none',padding:'8px 16px',borderRadius:8,cursor:'pointer',fontWeight:600}}>✕ Fermer</button>
           <span style={{fontSize:12,color:'#888',background:'#eee',padding:'4px 10px',borderRadius:20}}>👁 Prévisualisation page produit</span>
         </div>
-
         <div style={{background:'#fff3cd',color:'#856404',padding:'10px 20px',fontSize:14,textAlign:'center',borderBottom:'1px solid #ffc107'}}>
           🔥 <strong>23 personnes</strong> regardent ce produit · Stock limité : <strong>14 restants</strong>
         </div>
-
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:32,padding:32}}>
           <div>
             <div style={{background:'#f5f5f5',borderRadius:12,height:280,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',color:'#aaa',fontSize:40,marginBottom:12}}>
               🖼<p style={{fontSize:14,marginTop:8}}>Image produit</p>
             </div>
           </div>
-
           <div>
             <div style={{fontSize:14,marginBottom:10,color:'#555'}}>⭐⭐⭐⭐⭐ <span>4.8/5</span> <span style={{color:'#888',fontSize:13}}>(127 avis)</span></div>
             <h1 style={{fontSize:22,fontWeight:800,marginBottom:10,lineHeight:1.3}}>{product.title}</h1>
             <p style={{fontSize:14,color:'#666',lineHeight:1.6,marginBottom:20}}>{String(product.description||'').substring(0,150)}...</p>
-
             <p style={{fontSize:11,fontWeight:700,color:'#888',letterSpacing:1,marginBottom:10}}>CHOISISSEZ VOTRE OFFRE</p>
             {bundles.map((b,i) => (
               <div key={i} onClick={() => setSelectedBundle(b.qty)} style={{display:'flex',alignItems:'center',gap:12,padding:'12px 16px',border:`2px solid ${selectedBundle===b.qty?'#7c5cfc':'#eee'}`,borderRadius:10,marginBottom:8,cursor:'pointer',background:selectedBundle===b.qty?'#7c5cfc08':'#fff'}}>
@@ -81,12 +77,10 @@ function ProductPageView({ product, onClose }) {
                 </div>
               </div>
             ))}
-
             <button onClick={() => setAddedToCart(true)} style={{width:'100%',background:'linear-gradient(135deg,#7c5cfc,#9b7aff)',color:'white',border:'none',padding:16,borderRadius:12,fontSize:16,fontWeight:700,cursor:'pointer',marginBottom:10}}>
               {addedToCart ? '✅ Ajouté au panier !' : `🛒 Ajouter au panier — ${bundles[selectedBundle-1].price.toFixed(2)}€`}
             </button>
             <button style={{width:'100%',background:'#111',color:'white',border:'none',padding:14,borderRadius:12,fontSize:15,fontWeight:700,cursor:'pointer',marginBottom:16}}>⚡ Acheter maintenant</button>
-
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
               {['🚚 Livraison gratuite','🔄 Retour 30 jours','🔒 Paiement sécurisé','✅ Satisfait ou remboursé'].map((g,i) => (
                 <div key={i} style={{background:'#f8f8f8',padding:'8px 12px',borderRadius:8,fontSize:13,textAlign:'center',color:'#444'}}>{g}</div>
@@ -94,7 +88,6 @@ function ProductPageView({ product, onClose }) {
             </div>
           </div>
         </div>
-
         <div style={{padding:'32px',borderTop:'1px solid #eee'}}>
           <h2 style={{fontSize:20,fontWeight:800,marginBottom:20}}>Pourquoi choisir ce produit ?</h2>
           {bullets.map((b,i) => (
@@ -104,7 +97,6 @@ function ProductPageView({ product, onClose }) {
             </div>
           ))}
         </div>
-
         <div style={{padding:'32px',borderTop:'1px solid #eee'}}>
           <h2 style={{fontSize:20,fontWeight:800,marginBottom:20}}>⭐ Avis clients</h2>
           {reviews.map((r,i) => (
@@ -121,7 +113,6 @@ function ProductPageView({ product, onClose }) {
             </div>
           ))}
         </div>
-
         <div style={{padding:'32px',borderTop:'1px solid #eee'}}>
           <h2 style={{fontSize:20,fontWeight:800,marginBottom:20}}>❓ Questions fréquentes</h2>
           {faqs.map((f,i) => <FAQItem key={i} q={f.q} a={f.a} />)}
@@ -143,6 +134,7 @@ export default function ProductGenerator() {
   const [translatedResult, setTranslatedResult] = useState(null)
   const [selectedLang, setSelectedLang] = useState('')
   const [showPage, setShowPage] = useState(false)
+  const [exporting, setExporting] = useState(false)
 
   const generate = async () => {
     if (!url.trim() && !productName.trim()) return
@@ -207,6 +199,29 @@ export default function ProductGenerator() {
       setError(e.message)
     } finally {
       setPushing(false)
+    }
+  }
+
+  const exportProduct = async () => {
+    if (!result) return
+    setExporting(true)
+    try {
+      const res = await fetch('/api/export-product', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product: displayResult }),
+      })
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'fiche-produit.html'
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setExporting(false)
     }
   }
 
@@ -290,11 +305,12 @@ export default function ProductGenerator() {
             </div>
 
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 16 }}>
-              <button className="btn btn-primary" onClick={() => setShowPage(true)}>
-                👁 Voir la page produit
-              </button>
+              <button className="btn btn-primary" onClick={() => setShowPage(true)}>👁 Page produit</button>
               <button className="btn btn-secondary" onClick={pushToShopify} disabled={pushing || pushed}>
-                {pushing ? '⏳ Envoi...' : pushed ? '✅ Envoyé !' : '🏪 Envoyer sur Shopify'}
+                {pushing ? '⏳' : pushed ? '✅ Envoyé !' : '🏪 Shopify'}
+              </button>
+              <button className="btn btn-secondary" onClick={exportProduct} disabled={exporting}>
+                {exporting ? '⏳' : '📄 Exporter HTML'}
               </button>
             </div>
           </div>
