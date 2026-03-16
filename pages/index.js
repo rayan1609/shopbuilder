@@ -11,6 +11,8 @@ import Dashboard from '../components/Dashboard'
 import ThemeGenerator from '../components/ThemeGenerator'
 import LegalGenerator from '../components/LegalGenerator'
 import ViralScore from '../components/ViralScore'
+import AdAnalyzer from '../components/AdAnalyzer'
+import MultiShop from '../components/MultiShop'
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -20,8 +22,10 @@ export default function Home() {
     { id: 'dashboard', label: 'Dashboard', icon: '📈' },
     { id: 'generator', label: 'Générateur', icon: '⚡' },
     { id: 'viral', label: 'Score viral', icon: '🔥' },
+    { id: 'ads', label: 'Pubs & UGC', icon: '🎯' },
     { id: 'theme', label: 'Thème Shopify', icon: '🎨' },
     { id: 'shop', label: 'Créer un shop', icon: '🏪' },
+    { id: 'shops', label: 'Mes shops', icon: '🗂️' },
     { id: 'trends', label: 'Tendances', icon: '📊' },
     { id: 'spy', label: 'Spy', icon: '🕵️' },
     { id: 'margin', label: 'Marge', icon: '💰' },
@@ -87,8 +91,10 @@ export default function Home() {
             {activeTab === 'dashboard' && <Dashboard />}
             {activeTab === 'generator' && <ProductGenerator />}
             {activeTab === 'viral' && <ViralScore />}
+            {activeTab === 'ads' && <AdAnalyzer />}
             {activeTab === 'theme' && <ThemeGenerator />}
             {activeTab === 'shop' && <ShopCreator />}
+            {activeTab === 'shops' && <MultiShop />}
             {activeTab === 'trends' && <TrendFinder />}
             {activeTab === 'spy' && <SpyTool />}
             {activeTab === 'margin' && <MarginCalculator />}
