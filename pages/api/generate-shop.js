@@ -19,12 +19,12 @@ Réponds UNIQUEMENT en JSON valide:
 {
   "brandName": "Nom de marque mémorable et original",
   "slogan": "Slogan court et percutant",
-  "brandDescription": "Description de marque 2-3 phrases, ton de marque",
-  "aboutPage": "Page À propos complète 200 mots, histoire de la marque, mission, valeurs",
+  "brandDescription": "Description de marque 2-3 phrases",
+  "aboutPage": "Page À propos complète 200 mots",
   "shippingPolicy": "Politique de livraison professionnelle complète",
-  "returnPolicy": "Politique de retour 14 jours claire et rassurante",
-  "welcomeEmail": "Email de bienvenue chaleureux et engageant 150 mots",
-  "abandonedCartEmail": "Email relance panier abandonné persuasif 100 mots",
+  "returnPolicy": "Politique de retour 14 jours claire",
+  "welcomeEmail": "Email de bienvenue chaleureux 150 mots",
+  "abandonedCartEmail": "Email relance panier abandonné 100 mots",
   "colors": ["#hex1", "#hex2", "#hex3"],
   "fontSuggestion": "Police Google Fonts suggérée",
   "seoTitle": "Titre SEO homepage",
@@ -32,24 +32,24 @@ Réponds UNIQUEMENT en JSON valide:
 }`
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
+        model: 'llama-3.3-70b-versatile',
         max_tokens: 2000,
         messages: [{ role: 'user', content: prompt }],
+        response_format: { type: 'json_object' }
       }),
     })
 
     const data = await response.json()
-    const text = data.content[0].text
-    const clean = text.replace(/```json|```/g, '').trim()
-    const shop = JSON.parse(clean)
+    if (!response.ok) throw new Error(JSON.stringify(data))
+    const text = data.choices[0].message.content
+    const shop = JSON.parse(text)
 
     return res.status(200).json(shop)
   } catch (e) {
