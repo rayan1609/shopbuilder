@@ -8,19 +8,9 @@ export default function ProductGenerator() {
   const [error, setError] = useState(null)
   const [pushing, setPushing] = useState(false)
   const [pushed, setPushed] = useState(false)
-  const [showPage, setShowPage] = useState(false)
   const [translating, setTranslating] = useState(false)
   const [translatedResult, setTranslatedResult] = useState(null)
   const [selectedLang, setSelectedLang] = useState('')
-  const [PageComponent, setPageComponent] = useState(null)
-
-  const openPage = async () => {
-    if (!PageComponent) {
-      const mod = await import('./ProductPage')
-      setPageComponent(() => mod.default)
-    }
-    setShowPage(true)
-  }
 
   const generate = async () => {
     if (!url.trim() && !productName.trim()) return
@@ -101,10 +91,6 @@ export default function ProductGenerator() {
 
   return (
     <div>
-      {showPage && PageComponent && (
-        <PageComponent product={displayResult} onClose={() => setShowPage(false)} />
-      )}
-
       <div className="card">
         <p className="card-title">Étape 1 — Décris ton produit</p>
         <div className="input-group">
@@ -168,7 +154,6 @@ export default function ProductGenerator() {
             </div>
 
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 16 }}>
-              <button className="btn btn-primary" onClick={openPage}>👁 Voir la page produit</button>
               <button className="btn btn-secondary" onClick={pushToShopify} disabled={pushing || pushed}>
                 {pushing ? '⏳ Envoi...' : pushed ? '✅ Envoyé !' : '🏪 Envoyer sur Shopify'}
               </button>
