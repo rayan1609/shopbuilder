@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 export default function ProductGenerator() {
   const [url, setUrl] = useState('')
+  const [productName, setProductName] = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
@@ -9,7 +10,7 @@ export default function ProductGenerator() {
   const [pushed, setPushed] = useState(false)
 
   const generate = async () => {
-    if (!url.trim()) return
+    if (!url.trim() && !productName.trim()) return
     setLoading(true)
     setResult(null)
     setError(null)
@@ -17,7 +18,7 @@ export default function ProductGenerator() {
       const res = await fetch('/api/generate-product', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify({ url, productName }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Erreur inconnue')
@@ -51,9 +52,19 @@ export default function ProductGenerator() {
   return (
     <div>
       <div className="card">
-        <p className="card-title">Étape 1 — Colle une URL produit</p>
+        <p className="card-title">Étape 1 — Décris ton produit</p>
         <div className="input-group">
-          <label className="input-label">URL du produit (AliExpress, Amazon, TikTok Shop...)</label>
+          <label className="input-label">Nom du produit</label>
+          <input
+            className="input"
+            type="text"
+            placeholder="ex: Montre connectée sport étanche GPS..."
+            value={productName}
+            onChange={e => setProductName(e.target.value)}
+          />
+        </div>
+        <div className="input-group">
+          <label className="input-label">URL du produit (optionnel)</label>
           <input
             className="input"
             type="text"
@@ -63,7 +74,7 @@ export default function ProductGenerator() {
             onKeyDown={e => e.key === 'Enter' && generate()}
           />
         </div>
-        <button className="btn btn-primary" onClick={generate} disabled={loading || !url}>
+        <button className="btn btn-primary" onClick={generate} disabled={loading || (!url && !productName)}>
           {loading ? '⏳ Génération en cours...' : '⚡ Générer la fiche produit'}
         </button>
       </div>
@@ -71,7 +82,7 @@ export default function ProductGenerator() {
       {loading && (
         <div className="loading">
           <div className="spinner" />
-          L'IA analyse et génère ta fiche produit...
+          L'IA génère ta fiche produit...
         </div>
       )}
 
@@ -81,7 +92,6 @@ export default function ProductGenerator() {
         <>
           <div className="card">
             <p className="card-title">Résultat généré par l'IA</p>
-
             <div className="grid-2" style={{ marginBottom: 16 }}>
               <div>
                 <label className="input-label">Titre produit</label>
@@ -92,17 +102,14 @@ export default function ProductGenerator() {
                 <div className="result-field">{result.price}</div>
               </div>
             </div>
-
             <div style={{ marginBottom: 16 }}>
               <label className="input-label">Description optimisée</label>
               <div className="result-box">{result.description}</div>
             </div>
-
             <div style={{ marginBottom: 16 }}>
-              <label className="input-label">Points clés (bullet points)</label>
+              <label className="input-label">Points clés</label>
               <div className="result-box">{result.bullets}</div>
             </div>
-
             <div style={{ marginBottom: 16 }}>
               <label className="input-label">Tags SEO</label>
               <div>
@@ -111,26 +118,15 @@ export default function ProductGenerator() {
                 ))}
               </div>
             </div>
-
             <div style={{ marginBottom: 20 }}>
-              <label className="input-label">Script publicitaire (TikTok/Reels)</label>
+              <label className="input-label">Script publicitaire TikTok/Reels</label>
               <div className="result-box">{result.adScript}</div>
             </div>
-
-            <button
-              className="btn btn-primary"
-              onClick={pushToShopify}
-              disabled={pushing || pushed}
-            >
+            <button className="btn btn-primary" onClick={pushToShopify} disabled={pushing || pushed}>
               {pushing ? '⏳ Envoi vers Shopify...' : pushed ? '✅ Envoyé !' : '🏪 Envoyer vers Shopify'}
             </button>
           </div>
-
-          {pushed && (
-            <div className="success-banner">
-              ✅ Produit ajouté à ton shop Shopify avec succès !
-            </div>
-          )}
+          {pushed && <div className="success-banner">✅ Produit ajouté à ton shop Shopify !</div>}
         </>
       )}
 
