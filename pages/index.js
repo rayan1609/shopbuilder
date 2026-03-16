@@ -13,6 +13,7 @@ import LegalGenerator from '../components/LegalGenerator'
 import ViralScore from '../components/ViralScore'
 import AdAnalyzer from '../components/AdAnalyzer'
 import MultiShop from '../components/MultiShop'
+import Chatbot from '../components/Chatbot'
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -20,6 +21,7 @@ export default function Home() {
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: '📈' },
+    { id: 'chat', label: 'Conseiller IA', icon: '🤖' },
     { id: 'generator', label: 'Générateur', icon: '⚡' },
     { id: 'viral', label: 'Score viral', icon: '🔥' },
     { id: 'ads', label: 'Pubs & UGC', icon: '🎯' },
@@ -89,6 +91,7 @@ export default function Home() {
           </div>
           <div className="content">
             {activeTab === 'dashboard' && <Dashboard />}
+            {activeTab === 'chat' && <Chatbot />}
             {activeTab === 'generator' && <ProductGenerator />}
             {activeTab === 'viral' && <ViralScore />}
             {activeTab === 'ads' && <AdAnalyzer />}
