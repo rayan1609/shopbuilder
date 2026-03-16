@@ -19,6 +19,9 @@ import PricingStrategy from '../components/PricingStrategy'
 import LaunchChecklist from '../components/LaunchChecklist'
 import BrandName from '../components/BrandName'
 import ImageImporter from '../components/ImageImporter'
+import AdVisualCreator from '../components/AdVisualCreator'
+import TrendAlerts from '../components/TrendAlerts'
+import CheckoutPage from '../components/CheckoutPage'
 
 const menu = [
   { id: 'dashboard', label: 'Dashboard', icon: '📈' },
@@ -29,6 +32,7 @@ const menu = [
   { id: 'images', label: 'Import photos', icon: '🖼️' },
   { id: 'viral', label: 'Score viral', icon: '🔥' },
   { id: 'trends', label: 'Tendances', icon: '📊' },
+  { id: 'alerts', label: 'Alertes tendances', icon: '🔔' },
   { id: 'pricing', label: 'Stratégie prix', icon: '💰' },
 
   { type: 'separator', label: '— Boutique' },
@@ -44,7 +48,9 @@ const menu = [
 
   { type: 'separator', label: '— Marketing' },
   { id: 'ads', label: 'Pubs & UGC', icon: '🎯' },
+  { id: 'advisual', label: 'Créateur visuels', icon: '🎨' },
   { id: 'email', label: 'Emails', icon: '📧' },
+  { id: 'checkout', label: 'Page paiement', icon: '💳' },
 
   { type: 'separator', label: '— Outils' },
   { id: 'margin', label: 'Calculateur marge', icon: '📊' },
@@ -63,6 +69,11 @@ export default function Home() {
       <Head>
         <title>ShopBuilder — Ton outil dropshipping IA</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="manifest" href="/api/manifest" />
+        <meta name="theme-color" content="#7c5cfc" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="ShopBuilder" />
         <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
       </Head>
 
@@ -122,6 +133,7 @@ export default function Home() {
             {activeTab === 'images' && <ImageImporter />}
             {activeTab === 'viral' && <ViralScore />}
             {activeTab === 'trends' && <TrendFinder />}
+            {activeTab === 'alerts' && <TrendAlerts />}
             {activeTab === 'pricing' && <PricingStrategy />}
             {activeTab === 'theme' && <ThemeGenerator />}
             {activeTab === 'shop' && <ShopCreator />}
@@ -131,7 +143,9 @@ export default function Home() {
             {activeTab === 'spy' && <SpyTool />}
             {activeTab === 'competitors' && <CompetitorFinder />}
             {activeTab === 'ads' && <AdAnalyzer />}
+            {activeTab === 'advisual' && <AdVisualCreator />}
             {activeTab === 'email' && <EmailGenerator />}
+            {activeTab === 'checkout' && <CheckoutPage />}
             {activeTab === 'margin' && <MarginCalculator />}
             {activeTab === 'legal' && <LegalGenerator />}
             {activeTab === 'history' && <History />}
