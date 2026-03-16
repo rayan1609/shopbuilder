@@ -43,6 +43,11 @@ Réponds UNIQUEMENT en JSON valide:
     })
 
     const data = await response.json()
+    
+    if (!response.ok || !data.content || !data.content[0]) {
+      return res.status(500).json({ error: 'Erreur API: ' + JSON.stringify(data) })
+    }
+    
     const text = data.content[0].text
     const clean = text.replace(/```json|```/g, '').trim()
     const result = JSON.parse(clean)
