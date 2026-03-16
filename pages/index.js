@@ -8,6 +8,7 @@ import MarginCalculator from '../components/MarginCalculator'
 import EmailGenerator from '../components/EmailGenerator'
 import History from '../components/History'
 import Dashboard from '../components/Dashboard'
+import ThemeGenerator from '../components/ThemeGenerator'
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -16,6 +17,7 @@ export default function Home() {
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: '📈' },
     { id: 'generator', label: 'Générateur', icon: '⚡' },
+    { id: 'theme', label: 'Thème Shopify', icon: '🎨' },
     { id: 'shop', label: 'Créer un shop', icon: '🏪' },
     { id: 'trends', label: 'Tendances', icon: '🔥' },
     { id: 'spy', label: 'Spy', icon: '🕵️' },
@@ -80,6 +82,7 @@ export default function Home() {
           <div className="content">
             {activeTab === 'dashboard' && <Dashboard />}
             {activeTab === 'generator' && <ProductGenerator />}
+            {activeTab === 'theme' && <ThemeGenerator />}
             {activeTab === 'shop' && <ShopCreator />}
             {activeTab === 'trends' && <TrendFinder />}
             {activeTab === 'spy' && <SpyTool />}
@@ -109,7 +112,7 @@ export default function Home() {
         .app { display: flex; min-height: 100vh; }
         .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 56px; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 16px; align-items: center; justify-content: space-between; z-index: 100; }
         .menu-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text); width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 16px; }
-        .sidebar { width: var(--sidebar-width); background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 24px 12px; position: fixed; height: 100vh; top: 0; left: 0; z-index: 99; transition: transform 0.3s; }
+        .sidebar { width: var(--sidebar-width); background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 24px 12px; position: fixed; height: 100vh; top: 0; left: 0; z-index: 99; transition: transform 0.3s; overflow-y: auto; }
         .overlay { display: none; position: fixed; inset: 0; background: #00000080; z-index: 98; }
         .logo { display: flex; align-items: center; gap: 10px; padding: 8px 12px 28px; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; }
         .logo-icon { font-size: 22px; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
