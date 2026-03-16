@@ -32,7 +32,8 @@ Réponds UNIQUEMENT en JSON:
   "faq3Q": "Question 3", "faq3A": "Réponse 3",
   "urgencyText": "Texte urgence stock limité",
   "guaranteeText": "Texte garantie satisfaction",
-  "footerTagline": "Slogan footer"
+  "footerTagline": "Slogan footer",
+  "imageKeyword": "mot clé en anglais pour trouver une photo du produit (ex: watch, teddy bear, lamp)"
 }`
 
     const aiResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -52,6 +53,11 @@ Réponds UNIQUEMENT en JSON:
     const aiData = await aiResponse.json()
     const c = JSON.parse(aiData.choices[0].message.content)
     const brand = brandName || 'Ma Boutique'
+    const imgKeyword = encodeURIComponent(c.imageKeyword || product.title || 'product')
+    const heroImg = `https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1200&h=500&fit=crop&q=80`
+    const productImg1 = `https://source.unsplash.com/800x800/?${imgKeyword}&sig=1`
+    const productImg2 = `https://source.unsplash.com/800x800/?${imgKeyword}&sig=2`
+    const productImg3 = `https://source.unsplash.com/800x800/?${imgKeyword}&sig=3`
 
     const themeLiquid = `<!DOCTYPE html>
 <html lang="fr">
@@ -100,9 +106,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#3
 </html>`
 
     const indexLiquid = `<style>
-.hero{background:linear-gradient(135deg,${primaryColor}15,${secondaryColor}10);padding:80px 0;text-align:center}
-.hero h1{font-size:48px;font-weight:900;margin-bottom:20px;color:#111}
-.hero p{font-size:20px;color:#777;max-width:600px;margin:0 auto 32px;line-height:1.6}
+.hero{position:relative;padding:80px 0;text-align:center;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background-image:url('${productImg1}');background-size:cover;background-position:center;filter:brightness(0.3)}
+.hero-content{position:relative;z-index:1}
+.hero h1{font-size:48px;font-weight:900;margin-bottom:20px;color:white}
+.hero p{font-size:20px;color:rgba(255,255,255,0.85);max-width:600px;margin:0 auto 32px;line-height:1.6}
 .hero-cta{display:inline-block;background:${primaryColor};color:white;padding:18px 40px;border-radius:12px;font-size:18px;font-weight:700;text-decoration:none}
 .urgency-bar{background:#111;color:white;text-align:center;padding:12px;font-size:14px;font-weight:600}
 .features{padding:80px 0}
@@ -112,15 +120,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#3
 .feature-icon{font-size:40px;margin-bottom:16px}
 .feature-card h3{font-size:18px;font-weight:700;margin-bottom:10px}
 .feature-card p{font-size:14px;color:#777;line-height:1.6}
-.testimonials{padding:80px 0;background:#f8f8f8}
+.product-showcase{padding:80px 0;background:#f8f8f8}
+.product-showcase h2{text-align:center;font-size:36px;font-weight:800;margin-bottom:48px}
+.showcase-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.showcase-img{border-radius:16px;overflow:hidden;aspect-ratio:1}
+.showcase-img img{width:100%;height:100%;object-fit:cover;transition:transform 0.3s}
+.showcase-img:hover img{transform:scale(1.05)}
+.testimonials{padding:80px 0}
 .testimonials h2{text-align:center;font-size:36px;font-weight:800;margin-bottom:48px}
 .testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-.testimonial{background:white;border-radius:12px;padding:28px}
+.testimonial{background:#f8f8f8;border-radius:12px;padding:28px}
 .testimonial-text{font-size:15px;line-height:1.7;margin-bottom:16px;font-style:italic}
 .testimonial-name{font-weight:700;font-size:14px;color:#777}
-.faq{padding:80px 0}
+.faq{padding:80px 0;background:#f8f8f8}
 .faq h2{text-align:center;font-size:36px;font-weight:800;margin-bottom:48px}
-.faq-item{background:#f8f8f8;border-radius:12px;margin-bottom:12px;padding:20px 24px}
+.faq-item{background:white;border-radius:12px;margin-bottom:12px;padding:20px 24px}
 .faq-q{font-weight:600;font-size:16px;margin-bottom:8px}
 .faq-a{font-size:15px;color:#777;line-height:1.6}
 .guarantee{background:linear-gradient(135deg,${primaryColor},${secondaryColor});color:white;padding:60px 0;text-align:center}
@@ -128,14 +142,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#3
 .guarantee-badges{display:flex;justify-content:center;gap:32px;flex-wrap:wrap;margin-top:24px}
 .guarantee-badge .icon{font-size:32px;margin-bottom:8px}
 .guarantee-badge span{font-size:13px;font-weight:600;opacity:.9;display:block}
-@media(max-width:768px){.hero h1{font-size:32px}.features-grid{grid-template-columns:1fr 1fr}.testimonials-grid{grid-template-columns:1fr}}
+@media(max-width:768px){.hero h1{font-size:32px}.features-grid{grid-template-columns:1fr 1fr}.testimonials-grid{grid-template-columns:1fr}.showcase-grid{grid-template-columns:1fr 1fr}}
 </style>
 <div class="urgency-bar">🔥 ${c.urgencyText} · Livraison offerte aujourd'hui</div>
-<section class="hero"><div class="container">
+<section class="hero">
+<div class="hero-bg"></div>
+<div class="container hero-content">
 <h1>${c.heroTitle}</h1>
 <p>${c.heroSubtitle}</p>
 <a href="/collections/all" class="hero-cta">${c.heroCTA} →</a>
-</div></section>
+</div>
+</section>
 <section class="features"><div class="container">
 <h2>Pourquoi nous choisir ?</h2>
 <div class="features-grid">
@@ -144,6 +161,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#3
 <div class="feature-card"><div class="feature-icon">${c.feature3Icon}</div><h3>${c.feature3Title}</h3><p>${c.feature3Text}</p></div>
 <div class="feature-card"><div class="feature-icon">${c.feature4Icon}</div><h3>${c.feature4Title}</h3><p>${c.feature4Text}</p></div>
 </div></div></section>
+<section class="product-showcase"><div class="container">
+<h2>Découvrez notre produit</h2>
+<div class="showcase-grid">
+<div class="showcase-img"><img src="${productImg1}" alt="${product.title}" loading="lazy"></div>
+<div class="showcase-img"><img src="${productImg2}" alt="${product.title}" loading="lazy"></div>
+<div class="showcase-img"><img src="${productImg3}" alt="${product.title}" loading="lazy"></div>
+</div>
+</div></section>
 <section class="testimonials"><div class="container">
 <h2>⭐ Ce que disent nos clients</h2>
 <div class="testimonials-grid">
@@ -172,6 +197,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#3
 .product-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px}
 .main-image{background:#f5f5f5;border-radius:12px;min-height:400px;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .main-image img{max-width:100%;object-fit:contain}
+.product-thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.product-thumb{border-radius:8px;overflow:hidden;aspect-ratio:1;cursor:pointer;border:2px solid transparent}
+.product-thumb img{width:100%;height:100%;object-fit:cover}
+.product-thumb:hover{border-color:${primaryColor}}
 .product-info h1{font-size:30px;font-weight:800;margin-bottom:12px}
 .rating{margin-bottom:20px;color:#777;font-size:15px}
 .price{font-size:38px;font-weight:900;color:${primaryColor};margin-bottom:20px}
@@ -203,7 +232,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#3
 </style>
 <section class="product-page"><div class="container">
 <div class="product-grid">
-<div><div class="main-image">{{ product.featured_image | img_tag: product.title }}</div></div>
+<div>
+<div class="main-image">
+{% if product.featured_image %}
+{{ product.featured_image | img_tag: product.title }}
+{% else %}
+<img src="${productImg1}" alt="${product.title}" style="max-width:100%;object-fit:cover">
+{% endif %}
+</div>
+<div class="product-thumbs">
+{% for image in product.images limit:3 %}
+<div class="product-thumb"><img src="{{ image.src }}" alt="{{ product.title }}"></div>
+{% else %}
+<div class="product-thumb"><img src="${productImg1}" alt="${product.title}"></div>
+<div class="product-thumb"><img src="${productImg2}" alt="${product.title}"></div>
+<div class="product-thumb"><img src="${productImg3}" alt="${product.title}"></div>
+{% endfor %}
+</div>
+</div>
 <div class="product-info">
 <div class="rating">⭐⭐⭐⭐⭐ 4.8/5 · 127 avis vérifiés</div>
 <h1>{{ product.title }}</h1>
@@ -239,34 +285,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#3
 <script>
 function selectBundle(el){document.querySelectorAll('.bundle').forEach(b=>{b.style.borderColor='#eee';b.style.background='white';b.querySelector('.bundle-radio').style.background='transparent';b.querySelector('.bundle-radio').style.borderColor='#ddd'});el.style.borderColor='${primaryColor}';el.style.background='${primaryColor}08';el.querySelector('.bundle-radio').style.background='${primaryColor}';el.querySelector('.bundle-radio').style.borderColor='${primaryColor}';el.querySelector('.bundle-radio').style.boxShadow='inset 0 0 0 3px white'}
 </script>`
-
-    // Create ZIP using pure JavaScript (no external tools needed)
-    const { Writable } = require('stream')
-    
-    // Simple ZIP implementation
-    function crc32(buf) {
-      const table = new Uint32Array(256)
-      for (let i = 0; i < 256; i++) {
-        let c = i
-        for (let j = 0; j < 8; j++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1
-        table[i] = c
-      }
-      let crc = 0xFFFFFFFF
-      for (let i = 0; i < buf.length; i++) crc = table[(crc ^ buf[i]) & 0xFF] ^ (crc >>> 8)
-      return (crc ^ 0xFFFFFFFF) >>> 0
-    }
-
-    function writeUint16LE(val) {
-      const buf = Buffer.alloc(2)
-      buf.writeUInt16LE(val)
-      return buf
-    }
-
-    function writeUint32LE(val) {
-      const buf = Buffer.alloc(4)
-      buf.writeUInt32LE(val >>> 0)
-      return buf
-    }
 
    const collectionLiquid = `<style>.collection-page{padding:60px 0}.collection-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:32px}.product-card{border-radius:12px;overflow:hidden;border:1px solid #eee;transition:all 0.2s}.product-card:hover{box-shadow:0 8px 30px rgba(0,0,0,0.1);transform:translateY(-2px)}.product-card-img{background:#f5f5f5;height:240px;display:flex;align-items:center;justify-content:center;overflow:hidden}.product-card-img img{max-width:100%;max-height:100%;object-fit:contain}.product-card-info{padding:16px}.product-card-title{font-size:15px;font-weight:600;margin-bottom:8px;color:#111}.product-card-price{font-size:18px;font-weight:800;color:${primaryColor};margin-bottom:12px}.product-card-btn{display:block;width:100%;background:${primaryColor};color:white;border:none;padding:10px;border-radius:8px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer}@media(max-width:768px){.collection-grid{grid-template-columns:1fr 1fr}}</style>
 <section class="collection-page"><div class="container">
@@ -316,6 +334,30 @@ const notFoundLiquid = `<section style="padding:120px 0;text-align:center"><div 
 <a href="/" style="display:inline-block;background:${primaryColor};color:white;padding:14px 32px;border-radius:12px;font-weight:700;text-decoration:none">Retour à l'accueil</a>
 </div></section>`
 
+    function crc32(buf) {
+      const table = new Uint32Array(256)
+      for (let i = 0; i < 256; i++) {
+        let c = i
+        for (let j = 0; j < 8; j++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1
+        table[i] = c
+      }
+      let crc = 0xFFFFFFFF
+      for (let i = 0; i < buf.length; i++) crc = table[(crc ^ buf[i]) & 0xFF] ^ (crc >>> 8)
+      return (crc ^ 0xFFFFFFFF) >>> 0
+    }
+
+    function writeUint16LE(val) {
+      const buf = Buffer.alloc(2)
+      buf.writeUInt16LE(val)
+      return buf
+    }
+
+    function writeUint32LE(val) {
+      const buf = Buffer.alloc(4)
+      buf.writeUInt32LE(val >>> 0)
+      return buf
+    }
+
     const fileEntries = [
       { name: 'layout/theme.liquid', content: themeLiquid },
       { name: 'templates/index.liquid', content: indexLiquid },
@@ -328,6 +370,7 @@ const notFoundLiquid = `<section style="padding:120px 0;text-align:center"><div 
       { name: 'config/settings_data.json', content: JSON.stringify({"current":{}}) },
       { name: 'locales/fr.default.json', content: JSON.stringify({"general":{"language":"Français"}}) },
     ]
+
     const localHeaders = []
     let offset = 0
     const parts = []
@@ -339,22 +382,14 @@ const notFoundLiquid = `<section style="padding:120px 0;text-align:center"><div 
       const now = new Date()
       const dosTime = (now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1)
       const dosDate = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate()
-
       const localHeader = Buffer.concat([
         Buffer.from([0x50, 0x4B, 0x03, 0x04]),
-        writeUint16LE(20),
-        writeUint16LE(0),
-        writeUint16LE(0),
-        writeUint16LE(dosTime),
-        writeUint16LE(dosDate),
-        writeUint32LE(crc),
-        writeUint32LE(dataBuffer.length),
-        writeUint32LE(dataBuffer.length),
-        writeUint16LE(nameBuffer.length),
-        writeUint16LE(0),
+        writeUint16LE(20), writeUint16LE(0), writeUint16LE(0),
+        writeUint16LE(dosTime), writeUint16LE(dosDate),
+        writeUint32LE(crc), writeUint32LE(dataBuffer.length), writeUint32LE(dataBuffer.length),
+        writeUint16LE(nameBuffer.length), writeUint16LE(0),
         nameBuffer,
       ])
-
       localHeaders.push({ nameBuffer, crc, size: dataBuffer.length, dosTime, dosDate, offset })
       offset += localHeader.length + dataBuffer.length
       parts.push(localHeader, dataBuffer)
@@ -364,22 +399,11 @@ const notFoundLiquid = `<section style="padding:120px 0;text-align:center"><div 
     for (const h of localHeaders) {
       const centralHeader = Buffer.concat([
         Buffer.from([0x50, 0x4B, 0x01, 0x02]),
-        writeUint16LE(20),
-        writeUint16LE(20),
-        writeUint16LE(0),
-        writeUint16LE(0),
-        writeUint16LE(h.dosTime),
-        writeUint16LE(h.dosDate),
-        writeUint32LE(h.crc),
-        writeUint32LE(h.size),
-        writeUint32LE(h.size),
-        writeUint16LE(h.nameBuffer.length),
-        writeUint16LE(0),
-        writeUint16LE(0),
-        writeUint16LE(0),
-        writeUint16LE(0),
-        writeUint32LE(0),
-        writeUint32LE(h.offset),
+        writeUint16LE(20), writeUint16LE(20), writeUint16LE(0), writeUint16LE(0),
+        writeUint16LE(h.dosTime), writeUint16LE(h.dosDate),
+        writeUint32LE(h.crc), writeUint32LE(h.size), writeUint32LE(h.size),
+        writeUint16LE(h.nameBuffer.length), writeUint16LE(0), writeUint16LE(0),
+        writeUint16LE(0), writeUint16LE(0), writeUint32LE(0), writeUint32LE(h.offset),
         h.nameBuffer,
       ])
       parts.push(centralHeader)
@@ -389,12 +413,9 @@ const notFoundLiquid = `<section style="padding:120px 0;text-align:center"><div 
     const centralSize = offset - centralStart
     const endRecord = Buffer.concat([
       Buffer.from([0x50, 0x4B, 0x05, 0x06]),
-      writeUint16LE(0),
-      writeUint16LE(0),
-      writeUint16LE(fileEntries.length),
-      writeUint16LE(fileEntries.length),
-      writeUint32LE(centralSize),
-      writeUint32LE(centralStart),
+      writeUint16LE(0), writeUint16LE(0),
+      writeUint16LE(fileEntries.length), writeUint16LE(fileEntries.length),
+      writeUint32LE(centralSize), writeUint32LE(centralStart),
       writeUint16LE(0),
     ])
     parts.push(endRecord)
