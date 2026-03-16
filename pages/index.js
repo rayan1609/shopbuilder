@@ -18,6 +18,7 @@ import CompetitorFinder from '../components/CompetitorFinder'
 import PricingStrategy from '../components/PricingStrategy'
 import LaunchChecklist from '../components/LaunchChecklist'
 import BrandName from '../components/BrandName'
+import ImageImporter from '../components/ImageImporter'
 
 const menu = [
   { id: 'dashboard', label: 'Dashboard', icon: '📈' },
@@ -25,6 +26,7 @@ const menu = [
 
   { type: 'separator', label: '— Produits' },
   { id: 'generator', label: 'Générateur', icon: '⚡' },
+  { id: 'images', label: 'Import photos', icon: '🖼️' },
   { id: 'viral', label: 'Score viral', icon: '🔥' },
   { id: 'trends', label: 'Tendances', icon: '📊' },
   { id: 'pricing', label: 'Stratégie prix', icon: '💰' },
@@ -117,6 +119,7 @@ export default function Home() {
             {activeTab === 'dashboard' && <Dashboard />}
             {activeTab === 'chat' && <Chatbot />}
             {activeTab === 'generator' && <ProductGenerator />}
+            {activeTab === 'images' && <ImageImporter />}
             {activeTab === 'viral' && <ViralScore />}
             {activeTab === 'trends' && <TrendFinder />}
             {activeTab === 'pricing' && <PricingStrategy />}
