@@ -19,72 +19,82 @@ export default function AdAnalyzer() {
         body: JSON.stringify(form),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error)
+      if (!res.ok) throw new Error(data.error || 'Erreur inconnue')
       setResult(data)
     } catch (e) {
-      setError(e.message)
+      setError(String(e.message))
     } finally {
       setLoading(false)
     }
   }
 
+  const platforms = [
+    { value: 'tiktok', label: '🎵 TikTok' },
+    { value: 'instagram', label: '📸 Instagram' },
+    { value: 'facebook', label: '📘 Facebook' },
+    { value: 'youtube', label: '▶️ YouTube' },
+  ]
+
   return (
     <div>
       <div className="card">
-        <p className="card-title">🎯 Analyseur de pubs & Générateur UGC</p>
-        <div className="grid-2">
-          <div className="input-group">
-            <label className="input-label">Produit / Niche</label>
-            <input className="input" placeholder="ex: Lampe LED rechargeable" value={form.productName} onChange={e => update('productName', e.target.value)} />
-          </div>
-          <div className="input-group">
-            <label className="input-label">Plateforme cible</label>
-            <select className="input" value={form.platform} onChange={e => update('platform', e.target.value)}>
-              <option value="tiktok">TikTok</option>
-              <option value="instagram">Instagram Reels</option>
-              <option value="facebook">Facebook Ads</option>
-              <option value="youtube">YouTube Shorts</option>
-            </select>
+        <p className="card-title">🎯 Analyseur de pubs et Générateur UGC</p>
+        <div className="input-group">
+          <label className="input-label">Produit / Niche</label>
+          <input className="input" placeholder="ex: Lampe LED rechargeable" value={form.productName} onChange={e => update('productName', e.target.value)} />
+        </div>
+        <div className="input-group">
+          <label className="input-label">Plateforme cible</label>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {platforms.map(p => (
+              <button
+                key={p.value}
+                onClick={() => update('platform', p.value)}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: 20,
+                  border: `1px solid ${form.platform === p.value ? 'var(--accent)' : 'var(--border)'}`,
+                  background: form.platform === p.value ? '#7c5cfc20' : 'var(--surface2)',
+                  color: form.platform === p.value ? '#a084fd' : 'var(--muted)',
+                  cursor: 'pointer',
+                  fontSize: 13,
+                  fontWeight: 500,
+                }}
+              >
+                {p.label}
+              </button>
+            ))}
           </div>
         </div>
         <div className="input-group">
           <label className="input-label">Description de ta pub (optionnel)</label>
-          <textarea className="input" placeholder="Décris ta pub ou colle le texte de ton annonce..." value={form.adDescription} onChange={e => update('adDescription', e.target.value)} rows={3} />
+          <textarea className="input" placeholder="Décris ta pub ou colle le texte..." value={form.adDescription} onChange={e => update('adDescription', e.target.value)} rows={3} />
         </div>
         <button className="btn btn-primary" onClick={analyze} disabled={loading || !form.productName}>
           {loading ? '⏳ Analyse...' : '🎯 Analyser et générer'}
         </button>
       </div>
 
-      {loading && <div className="loading"><div className="spinner" />Analyse et génération de contenus publicitaires...</div>}
+      {loading && <div className="loading"><div className="spinner" />Génération des scripts UGC...</div>}
       {error && <div className="error-banner">❌ {error}</div>}
 
       {result && (
         <div>
-          <div className="card">
-            <p className="card-title">📊 Analyse de la stratégie</p>
-            <div className="result-box">{result.analysis}</div>
-          </div>
-          <div className="card">
-            <p className="card-title">🎬 Script UGC #1 — Angle problème/solution</p>
-            <div className="result-box">{result.script1}</div>
-          </div>
-          <div className="card">
-            <p className="card-title">🎬 Script UGC #2 — Angle témoignage</p>
-            <div className="result-box">{result.script2}</div>
-          </div>
-          <div className="card">
-            <p className="card-title">🎬 Script UGC #3 — Angle démonstration</p>
-            <div className="result-box">{result.script3}</div>
-          </div>
-          <div className="card">
-            <p className="card-title">💡 Hooks accrocheurs (5 idées)</p>
-            <div className="result-box">{result.hooks}</div>
-          </div>
-          <div className="card">
-            <p className="card-title">🎵 Sons/Musiques tendance suggérés</p>
-            <div className="result-box">{result.music}</div>
-          </div>
+          {[
+            { key: 'analysis', title: '📊 Analyse stratégique' },
+            { key: 'script1', title: '🎬 Script UGC — Problème/Solution' },
+            { key: 'script2', title: '🎬 Script UGC — Témoignage' },
+            { key: 'script3', title: '🎬 Script UGC — Démonstration' },
+            { key: 'hooks', title: '💡 Hooks accrocheurs' },
+            { key: 'music', title: '🎵 Sons tendance suggérés' },
+          ].map(item => (
+            result[item.key] ? (
+              <div key={item.key} className="card">
+                <p className="card-title">{item.title}</p>
+                <div className="result-box">{String(result[item.key])}</div>
+              </div>
+            ) : null
+          ))}
         </div>
       )}
     </div>
