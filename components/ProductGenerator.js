@@ -23,6 +23,12 @@ export default function ProductGenerator() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Erreur inconnue')
       setResult(data)
+      // Sauvegarder dans l'historique
+try {
+  const history = JSON.parse(localStorage.getItem('shopbuilder_history') || '[]')
+  history.unshift({ ...data, date: new Date().toLocaleDateString('fr-FR') })
+  localStorage.setItem('shopbuilder_history', JSON.stringify(history.slice(0, 50)))
+} catch (e) {}
     } catch (e) {
       setError(e.message)
     } finally {
