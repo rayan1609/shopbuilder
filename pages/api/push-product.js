@@ -6,21 +6,39 @@ export default async function handler(req, res) {
   const token = process.env.SHOPIFY_ACCESS_TOKEN
 
   if (!shop || !token) {
-    return res.status(500).json({ error: 'Shopify non configuré. Vérifie tes variables d\'environnement.' })
+    return res.status(500).json({ error: 'Shopify non configuré.' })
   }
 
   try {
+    const bullets = Array.isArray(product.bullets)
+      ? product.bullets
+      : String(product.bullets || '').split('\n').filter(b => b.trim())
+
+    const bulletsHtml = bullets.map(b => 
+      `<li>${String(b).replace('✓', '').trim()}</li>`
+    ).join('')
+
+    const bodyHtml = `
+      <p>${product.description}</p>
+      <ul>${bulletsHtml}</ul>
+    `
+
+    const price = parseFloat(
+      String(product.price || '29.99').replace(/[^0-9.]/g, '')
+    ) || 29.99
+
     const shopifyProduct = {
       product: {
         title: product.title,
-        body_html: `<p>${product.description}</p><ul>${product.bullets?.split('\n').map(b => `<li>${b}</li>`).join('')}</ul>`,
-        tags: product.tags?.join(', '),
+        body_html: bodyHtml,
+        tags: Array.isArray(product.tags) ? product.tags.join(', ') : product.tags,
         variants: [{
-          price: product.price?.replace('€', '').replace(',', '.') || '29.99',
+          price: price.toFixed(2),
           inventory_management: 'shopify',
           fulfillment_service: 'manual',
+          inventory_quantity: 100,
         }],
-        status: 'draft',
+        status: 'active',
       }
     }
 
@@ -36,7 +54,7 @@ export default async function handler(req, res) {
     const data = await response.json()
     if (!response.ok) throw new Error(JSON.stringify(data.errors))
 
-    return res.status(200).json({ success: true, productId: data.product.id })
+    return res.status(200).json({ success: true, productId: data.product.id, productUrl: `https://${shop}/products/${data.product.handle}` })
   } catch (e) {
     return res.status(500).json({ error: 'Erreur Shopify: ' + e.message })
   }
