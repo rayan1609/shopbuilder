@@ -7,12 +7,14 @@ import SpyTool from '../components/SpyTool'
 import MarginCalculator from '../components/MarginCalculator'
 import EmailGenerator from '../components/EmailGenerator'
 import History from '../components/History'
+import Dashboard from '../components/Dashboard'
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState('generator')
+  const [activeTab, setActiveTab] = useState('dashboard')
   const [menuOpen, setMenuOpen] = useState(false)
 
   const tabs = [
+    { id: 'dashboard', label: 'Dashboard', icon: '📈' },
     { id: 'generator', label: 'Générateur', icon: '⚡' },
     { id: 'shop', label: 'Créer un shop', icon: '🏪' },
     { id: 'trends', label: 'Tendances', icon: '🔥' },
@@ -76,6 +78,7 @@ export default function Home() {
             <div className="badge">Powered by AI</div>
           </div>
           <div className="content">
+            {activeTab === 'dashboard' && <Dashboard />}
             {activeTab === 'generator' && <ProductGenerator />}
             {activeTab === 'shop' && <ShopCreator />}
             {activeTab === 'trends' && <TrendFinder />}
