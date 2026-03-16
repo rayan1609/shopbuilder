@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import ProductPage from './ProductPage'
+import dynamic from 'next/dynamic'
+const ProductPage = dynamic(() => import('./ProductPage'), { ssr: false })
 
 export default function ProductGenerator() {
   const [url, setUrl] = useState('')
