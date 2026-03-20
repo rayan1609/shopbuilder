@@ -1,24 +1,25 @@
 import { NextResponse } from 'next/server'
 
-const PASSWORD = process.env.APP_PASSWORD || 'shopbuilder2024'
-
 export function middleware(request) {
   const { pathname } = request.nextUrl
 
-  // Skip auth for the login page and static files
-  if (pathname === '/login' || pathname.startsWith('/_next') || pathname.startsWith('/favicon')) {
+  if (
+    pathname === '/login' ||
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api/auth-login') ||
+    pathname.startsWith('/favicon')
+  ) {
     return NextResponse.next()
   }
 
-  // Check cookie
   const auth = request.cookies.get('sb_auth')
-  if (auth?.value === PASSWORD) {
+  const password = process.env.APP_PASSWORD || 'shopbuilder2024'
+
+  if (auth?.value === password) {
     return NextResponse.next()
   }
 
-  // Redirect to login
-  const loginUrl = new URL('/login', request.url)
-  return NextResponse.redirect(loginUrl)
+  return NextResponse.redirect(new URL('/login', request.url))
 }
 
 export const config = {
